@@ -93,13 +93,13 @@ jobs:
         kubectl replace --force -f k8s/deployment.yaml
         kubectl replace --force -f k8s/service.yaml
         
-    - name: Post CML report
-      env:
-        REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # 🔥 this is required
-      run: |
-        echo "## CI/CD Pipeline Report" > report.md
-        echo "Tests passed and model deployed to GKE successfully!" >> report.md
-        echo "Image pushed to Artifact Registry: us-central1-docker.pkg.dev/sheetgpt-385916/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest" >> report.md
-        echo "Deployed to GKE" >> report.md
-        cml comment create report.md
+    # - name: Post CML report
+    #   env:
+    #     REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #   run: |
+    #     echo "## CI/CD Pipeline Report" > report.md
+    #     echo "Tests passed and model deployed to GKE successfully!" >> report.md
+    #     echo "Image pushed to Artifact Registry: us-central1-docker.pkg.dev/sheetgpt-385916/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest" >> report.md
+    #     echo "Deployed to GKE" >> report.md
+    #     cml comment create report.md
 
