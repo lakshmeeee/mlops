@@ -60,8 +60,8 @@ jobs:
       run: pip install -r requirements.txt
 
     # Run tests
-    # - name: Run tests
-    #   run: PYTHONPATH=. pytest -v
+    - name: Run tests
+      run: PYTHONPATH=. pytest -v
         
     # Configure Docker to push to Artifact Registry
     - name: Configure Docker for Artifact Registry
@@ -93,11 +93,11 @@ jobs:
         kubectl replace --force -f k8s/deployment.yaml
         kubectl replace --force -f k8s/service.yaml
         
-    # - name: Post CML report
-    #   run: |
-    #     echo "## CI/CD Pipeline Report" > report.md
-    #     echo "Tests passed and model deployed to GKE successfully!" >> report.md
-    #     echo "Image pushed to Artifact Registry: us-central1-docker.pkg.dev/sheetgpt-385916/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest" >> report.md
-    #     echo "Deployed to GKE" >> report.md
-    #     cml comment create report.md
+    - name: Post CML report
+      run: |
+        echo "## CI/CD Pipeline Report" > report.md
+        echo "Tests passed and model deployed to GKE successfully!" >> report.md
+        echo "Image pushed to Artifact Registry: us-central1-docker.pkg.dev/sheetgpt-385916/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest" >> report.md
+        echo "Deployed to GKE" >> report.md
+        cml comment create report.md
 
