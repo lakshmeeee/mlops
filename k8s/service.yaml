@@ -27,7 +27,7 @@ spec:
   - nodePort: 31332
     port: 80
     protocol: TCP
-    targetPort: 80
+    targetPort: 8080
   selector:
     app: iris-deployment-1
     app.kubernetes.io/managed-by: cloud-console
