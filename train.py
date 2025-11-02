@@ -13,7 +13,7 @@ if __name__ == '__main__':
     GCS_BUCKET_NAME = "mlops-week1"
     GCS_MODEL_PATH = "week6/model.joblib"
 
-    # Read dataset
+    # Read dataset1
     data = pd.read_csv(DATASET_LOCAL_PATH)
     
     # Train/test split
