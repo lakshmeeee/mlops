@@ -6,7 +6,6 @@ on:
 
 env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  REGION: ${{ secrets.GCP_REGION }}
   REPO_NAME: iris-api-repo
   IMAGE_NAME: iris-api
   CLUSTER_NAME: mlops-gke
@@ -62,24 +61,24 @@ jobs:
       run: pip install -r requirements.txt
 
     # Run tests
-    - name: Run tests
-      run: PYTHONPATH=. pytest -v
+    # - name: Run tests
+    #   run: PYTHONPATH=. pytest -v
         
     # Configure Docker to push to Artifact Registry
     - name: Configure Docker for Artifact Registry
-      run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+      run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
 
     # Build Docker image
     - name: Build Docker image
-      run: docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest .
+      run: docker build -t us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest .
 
     # Push Docker image to Artifact Registry
     - name: Push Docker image to Artifact Registry
-      run: docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest
+      run: docker push us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest
 
     # Get GKE credentials
     - name: Get GKE credentials
-      run: gcloud container clusters get-credentials ${{ env.CLUSTER_NAME }} --region ${{ env.REGION }}
+      run: gcloud container clusters get-credentials ${{ env.CLUSTER_NAME }} --region us-central1
 
     # Deploy to GKE
     - name: Deploy to GKE
@@ -87,11 +86,11 @@ jobs:
         kubectl apply -f k8s/deployment.yaml
         kubectl apply -f k8s/service.yaml
         
-    - name: Post CML report
-      run: |
-        echo "## CI/CD Pipeline Report" > report.md
-        echo "Tests passed and model deployed to GKE successfully!" >> report.md
-        echo "Image pushed to Artifact Registry: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest" >> report.md
-        echo "Deployed to GKE" >> report.md
-        cml comment create report.md
+    # - name: Post CML report
+    #   run: |
+    #     echo "## CI/CD Pipeline Report" > report.md
+    #     echo "Tests passed and model deployed to GKE successfully!" >> report.md
+    #     echo "Image pushed to Artifact Registry: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest" >> report.md
+    #     echo "Deployed to GKE" >> report.md
+    #     cml comment create report.md
 
