@@ -94,6 +94,8 @@ jobs:
         kubectl replace --force -f k8s/service.yaml
         
     - name: Post CML report
+      env:
+        REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # 🔥 this is required
       run: |
         echo "## CI/CD Pipeline Report" > report.md
         echo "Tests passed and model deployed to GKE successfully!" >> report.md
