@@ -60,8 +60,8 @@ jobs:
       run: pip install -r requirements.txt
 
     # Run tests
-    # - name: Run tests
-    #   run: PYTHONPATH=. pytest -v
+    - name: Run tests
+      run: PYTHONPATH=. pytest -v
         
     # Configure Docker to push to Artifact Registry
     - name: Configure Docker for Artifact Registry
@@ -94,6 +94,8 @@ jobs:
         kubectl replace --force -f k8s/service.yaml
         
     # - name: Post CML report
+    #   env:
+    #     REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     #   run: |
     #     echo "## CI/CD Pipeline Report" > report.md
     #     echo "Tests passed and model deployed to GKE successfully!" >> report.md
