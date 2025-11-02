@@ -90,8 +90,8 @@ jobs:
     - name: Deploy to GKE
       run: |
         export USE_GKE_GCLOUD_AUTH_PLUGIN=True
-        kubectl apply -f k8s/deployment.yaml
-        kubectl apply -f k8s/service.yaml
+        kubectl replace --force -f k8s/deployment.yaml
+        kubectl replace --force -f k8s/service.yaml
         
     # - name: Post CML report
     #   run: |
