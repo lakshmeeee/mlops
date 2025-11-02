@@ -17,7 +17,7 @@ model = joblib.load("model.joblib")
 
 @app.get("/")
 def root():
-    return {"message": "IRIS model API (FastAPI) is running!"}
+    return {"message": "Iris Prediction API is running!"}
 
 @app.post("/predict")
 def predict(features: IrisFeatures):
