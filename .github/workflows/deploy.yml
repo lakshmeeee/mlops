@@ -5,7 +5,6 @@ on:
     branches: [ "main" ]
 
 env:
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   REPO_NAME: iris-api-repo
   IMAGE_NAME: iris-api
   CLUSTER_NAME: mlops-gke
@@ -27,8 +26,8 @@ jobs:
         credentials_json: ${{ secrets.GCP_SERVICE_KEY }}
 
     # Verify account (optional but very useful for debugging)
-    - name: Verify active account
-      run: gcloud auth list
+    # - name: Verify active account
+    #   run: gcloud auth list
 
     # Set up gcloud CLI
     - name: Set up gcloud CLI
@@ -70,11 +69,11 @@ jobs:
 
     # Build Docker image
     - name: Build Docker image
-      run: docker build -t us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest .
+      run: docker build -t us-central1-docker.pkg.dev/sheetgpt-385916/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest .
 
     # Push Docker image to Artifact Registry
     - name: Push Docker image to Artifact Registry
-      run: docker push us-central1-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest
+      run: docker push us-central1-docker.pkg.dev/sheetgpt-385916/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest
 
     # Get GKE credentials
     - name: Get GKE credentials
@@ -90,7 +89,7 @@ jobs:
     #   run: |
     #     echo "## CI/CD Pipeline Report" > report.md
     #     echo "Tests passed and model deployed to GKE successfully!" >> report.md
-    #     echo "Image pushed to Artifact Registry: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest" >> report.md
+    #     echo "Image pushed to Artifact Registry: us-central1-docker.pkg.dev/sheetgpt-385916/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest" >> report.md
     #     echo "Deployed to GKE" >> report.md
     #     cml comment create report.md
 
