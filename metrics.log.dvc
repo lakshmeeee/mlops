@@ -1,0 +1,5 @@
+outs:
+- md5: 14fcae0d3181818b9b51afe1c32e3747
+  size: 34
+  hash: md5
+  path: metrics.log
