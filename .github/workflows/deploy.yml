@@ -21,15 +21,15 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Get GCP Secret Key file
-      run: |
-        echo "${{ secrets.GCP_SERVICE_KEY }}" | base64 -d > service-account.json
-
     # 2️⃣ Authenticate to Google Cloud
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v2
       with:
         credentials_json: ${{ secrets.GCP_SERVICE_KEY }}
+
+    # 3️⃣ Verify account (optional but very useful for debugging)
+    - name: Verify active account
+      run: gcloud auth list
 
     # 4️⃣ Set up gcloud CLI
     - name: Set up gcloud CLI
@@ -71,7 +71,6 @@ jobs:
         echo "## Model metrics" > report.md
         cat metrics.log >> report.md
         cml comment create report.md
-
     # 1️⃣1️⃣ Configure Docker to push to Artifact Registry
     - name: Configure Docker for Artifact Registry
       run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
@@ -93,4 +92,3 @@ jobs:
       run: |
         kubectl apply -f k8s/deployment.yaml
         kubectl apply -f k8s/service.yaml
-
