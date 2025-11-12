@@ -6,3 +6,5 @@ joblib
 pytest
 httpx
 google-cloud-storage
+pydantic
+opentelemetry-exporter-gcp-trace

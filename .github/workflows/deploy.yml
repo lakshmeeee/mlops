@@ -1,105 +1,126 @@
-name: CI/CD to GKE
+name: CI/CD to GKE with CML
 
 on:
   push:
     branches: [ "main" ]
 
 env:
+  PROJECT_ID: sheetgpt-385916
+  REGION: us-central1-a
+  CLUSTER_NAME: mlops-assignment-cluster
   REPO_NAME: iris-api-repo
   IMAGE_NAME: iris-api
-  CLUSTER_NAME: mlops-gke
   GCS_DATA_PATH: gs://mlops-week1/v1/data/data.csv
+  MODEL_PATH: gs://mlops-week1/week6/model.joblib
+  DEPLOYMENT_DIR: k8s  # directory containing your YAML files
 
 jobs:
-  build-and-deploy:
+  build-test-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    # Checkout code
+    # -------------------------------
+    # 1️⃣ Checkout code
+    # -------------------------------
     - name: Checkout code
       uses: actions/checkout@v4
 
-    # Authenticate to Google Cloud
+    # -------------------------------
+    # 2️⃣ Authenticate to Google Cloud
+    # -------------------------------
     - name: Authenticate to Google Cloud
       uses: google-github-actions/auth@v2
       with:
         credentials_json: ${{ secrets.GCP_SERVICE_KEY }}
 
-    # Verify account (optional but very useful for debugging)
-    # - name: Verify active account
-    #   run: gcloud auth list
-
-    # Set up gcloud CLI
-    - name: Set up gcloud CLI
+    - name: Setup gcloud CLI
       uses: google-github-actions/setup-gcloud@v2
       with:
         project_id: ${{ env.PROJECT_ID }}
+        install_components: gke-gcloud-auth-plugin
 
-    # Set up CML (for model metrics reporting)
-    - name: Set up CML
-      uses: iterative/setup-cml@v2
-
-    # Set up Python
-    - name: Set up Python
+    # -------------------------------
+    # 3️⃣ Setup Python + dependencies
+    # -------------------------------
+    - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: '3.10'
 
-    # Get dataset from GCS
-    - name: Get dataset from GCS
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install cml
+
+    # -------------------------------
+    # 4️⃣ Download model and data
+    # -------------------------------
+    - name: Fetch data and model
       run: |
         mkdir -p data
         gsutil cp $GCS_DATA_PATH data/data.csv
+        gsutil cp $MODEL_PATH model.joblib
 
-    - name: Download model from GCS
-      run: |
-        gsutil cp gs://mlops-week1/week6/model.joblib model.joblib
-
-    # Install dependencies
-    - name: Install dependencies
-      run: pip install -r requirements.txt
-
-    # Run tests
+    # -------------------------------
+    # 5️⃣ Run tests
+    # -------------------------------
     - name: Run tests
-      run: PYTHONPATH=. pytest -v
-        
-    # Configure Docker to push to Artifact Registry
-    - name: Configure Docker for Artifact Registry
-      run: gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
-
-    # Build Docker image
-    - name: Build Docker image
-      run: docker build -t us-central1-docker.pkg.dev/sheetgpt-385916/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest .
-
-    # Push Docker image to Artifact Registry
-    - name: Push Docker image to Artifact Registry
-      run: docker push us-central1-docker.pkg.dev/sheetgpt-385916/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest
-
-    - name: Configure kubectl
       run: |
-        sudo apt-get update
-        sudo apt-get install -y curl apt-transport-https ca-certificates gnupg
-        curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
-        echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-        sudo apt-get update
-        sudo apt-get install -y google-cloud-sdk-gke-gcloud-auth-plugin
-        gcloud container clusters get-credentials ${{ env.CLUSTER_NAME }} --region us-central1
-        echo "kubectl configured."
+        PYTHONPATH=. pytest -v --disable-warnings
 
-    # Deploy to GKE
-    - name: Deploy to GKE
+    # -------------------------------
+    # 6️⃣ Build and push Docker image
+    # -------------------------------
+    - name: Configure Docker for Artifact Registry
+      run: gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+    - name: Build Docker image
+      run: |
+        docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest .
+
+    - name: Push Docker image
+      run: |
+        docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest
+
+    # -------------------------------
+    # 7️⃣ Deploy to GKE
+    # -------------------------------
+    - name: Configure kubectl and connect to cluster
+      run: |
+        gcloud container clusters get-credentials ${{ env.CLUSTER_NAME }} --region=${{ env.REGION }} --project=${{ env.PROJECT_ID }}
+
+    - name: Deploy updated manifests
       run: |
         export USE_GKE_GCLOUD_AUTH_PLUGIN=True
-        kubectl replace --force -f k8s/deployment.yaml
-        kubectl replace --force -f k8s/service.yaml
-        
-    # - name: Post CML report
-    #   env:
-    #     REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #   run: |
-    #     echo "## CI/CD Pipeline Report" > report.md
-    #     echo "Tests passed and model deployed to GKE successfully!" >> report.md
-    #     echo "Image pushed to Artifact Registry: us-central1-docker.pkg.dev/sheetgpt-385916/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest" >> report.md
-    #     echo "Deployed to GKE" >> report.md
-    #     cml comment create report.md
+        kubectl apply -f ${{ env.DEPLOYMENT_DIR }}/deployment.yaml
+        kubectl apply -f ${{ env.DEPLOYMENT_DIR }}/service.yaml
+        kubectl apply -f ${{ env.DEPLOYMENT_DIR }}/hpa.yaml
+
+    # -------------------------------
+    # 8️⃣ Validate Deployment
+    # -------------------------------
+    - name: Verify rollout
+      run: |
+        kubectl rollout status deployment/mlops-assignment-service --timeout=120s
+        kubectl get pods -o wide
+        kubectl get hpa
+
+    # -------------------------------
+    # 9️⃣ Post CML Report to PR / Commit
+    # -------------------------------
+    - name: Post CML Report
+      env:
+        REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "## ✅ CI/CD Pipeline Report" > report.md
+        echo "**Project:** ${{ env.PROJECT_ID}" >> report.md
+        echo "**Cluster:** ${{ env.CLUSTER_NAME}" >> report.md
+        echo "**Image:** ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest" >> report.md
+        echo "**Deployment:** mlops-assignment-service" >> report.md
+        echo "**Tests:** Passed ✅" >> report.md
+        echo "**Auto Scaling:** Applied (minPods=1, maxPods=3)" >> report.md
+        echo "**Deployment URL:** Check LoadBalancer IP from GKE Service" >> report.md
+
+        # Post CML comment to PR or commit
+        cml comment create report.md
 
