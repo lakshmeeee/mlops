@@ -130,6 +130,3 @@ jobs:
         echo "**Auto Scaling:** Applied (minPods=1, maxPods=3)" >> report.md
         echo "**Deployment URL:** Check LoadBalancer IP from GKE Service" >> report.md
 
-        # Post CML comment to PR or commit
-        cml comment create report.md
-
