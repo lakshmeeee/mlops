@@ -113,8 +113,8 @@ jobs:
         REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         echo "## ✅ CI/CD Pipeline Report" > report.md
-        echo "**Project:** ${{ env.PROJECT_ID}" >> report.md
-        echo "**Cluster:** ${{ env.CLUSTER_NAME}" >> report.md
+        echo "**Project:** ${{ env.PROJECT_ID}}" >> report.md
+        echo "**Cluster:** ${{ env.CLUSTER_NAME}}" >> report.md
         echo "**Image:** ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest" >> report.md
         echo "**Deployment:** mlops-assignment-service" >> report.md
         echo "**Tests:** Passed ✅" >> report.md
