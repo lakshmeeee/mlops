@@ -38,6 +38,10 @@ jobs:
       with:
         project_id: ${{ env.PROJECT_ID }}
         install_components: gke-gcloud-auth-plugin
+        
+    # Set up CML (for model metrics reporting)
+    - name: Set up CML
+      uses: iterative/setup-cml@v2
 
     # -------------------------------
     # 3️⃣ Setup Python + dependencies
