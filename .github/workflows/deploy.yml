@@ -54,7 +54,6 @@ jobs:
     - name: Install dependencies
       run: |
         pip install -r requirements.txt
-        pip install cml
 
     # -------------------------------
     # 4️⃣ Download model and data
