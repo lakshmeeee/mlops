@@ -74,11 +74,11 @@ To compensate, we must increase the total amount of data so that the model still
 
 If **10%** of the dataset is poisoned and we want **1,000 clean examples**:
 
-`clean_needed = 1000
-noise = 10%
-total_required = clean_needed / (1 - noise)
-= 1000 / 0.9
-= 1111 examples`
+`clean_needed = 1000`
+`noise = 10%`
+`total_required = clean_needed / (1 - noise)`
+`= 1000 / 0.9`
+`= 1111 examples`
 
 If **50%** is poisoned:
 
