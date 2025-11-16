@@ -9,3 +9,6 @@ poisoned_data/
 outputs/clean/.ipynb_checkpoints/
 scripts/.ipynb_checkpoints/
 /poisoned_data
+outputs/poison_5/.ipynb_checkpoints/
+outputs/poison_10/.ipynb_checkpoints/
+outputs/poison_15/.ipynb_checkpoints/

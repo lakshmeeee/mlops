@@ -1,0 +1,2 @@
+train_accuracy,val_accuracy,poison_fraction
+0.9666666666666667,0.8536585365853658,5pct
