@@ -36,7 +36,7 @@ def run_training(data_path, poison_fraction_label, experiment_name,
     mlflow.set_experiment(experiment_name)
     # ------------------------------------------------------
 
-    with mlflow.start_run(run_name=f"{poison_fraction_label}_{model_name}"):
+    with mlflow.start_run(run_name=f"{poison_fraction_label}_knn"):
 
         # Log parameters
         mlflow.log_param("poison_fraction", poison_fraction_label)
