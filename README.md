@@ -7,6 +7,8 @@
 * poison_5 - contains metrics and model for run with 5% poisoning
 * poison_10 - contains metrics and model for run with 10% poisoning
 * poison_15 - contains metrics and model for run with 15% poisoning
+* train_accuracy.png - output graph from mlflow
+* validation_accuracy.png - output graph from mlflow
 
 ##### Scripts:
 * poisoning.py - for poisoning by interchanging labels
