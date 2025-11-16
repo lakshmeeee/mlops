@@ -5,3 +5,7 @@
 /__pycache__/
 tests/.ipynb_checkpoints/
 k8s/.ipynb_checkpoints/
+poisoned_data/
+outputs/clean/.ipynb_checkpoints/
+scripts/.ipynb_checkpoints/
+/poisoned_data

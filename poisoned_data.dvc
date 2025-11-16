@@ -1,0 +1,6 @@
+outs:
+- md5: a870f4e89a9179a1365952401a7652e5.dir
+  size: 5186
+  nfiles: 2
+  hash: md5
+  path: poisoned_data
