@@ -24,11 +24,16 @@
 ```LLMOPs```
 
 
-
-
 ## GCP Project
 
 [Project URL](https://console.cloud.google.com/welcome?project=sheetgpt-385916)
+
+## Run
+
+- Use Vertex AI Workbench Instance Jupyter Lab
+- Create virtual env
+- Install requirements.txt or requirements_1.txt on Python 3.10
+- Other GCP services required include Kubernetes, Tracing, Logging, IAM Roles, Firewall policies
 
 ## Week 1
 
