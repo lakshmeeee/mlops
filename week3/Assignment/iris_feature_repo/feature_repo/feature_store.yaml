@@ -1,0 +1,11 @@
+project: iris_project
+registry: gs://mlops-week1/feast/registry.db
+provider: gcp
+
+offline_store:
+  type: bigquery
+  dataset: iris_dataset
+  location: us
+online_store:
+    type: sqlite
+    path: data/online_store.db
